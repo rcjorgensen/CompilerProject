@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/CompilerProject.iml" filepath="$PROJECT_DIR$/.idea/CompilerProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/edu.citadel.assembler/edu.citadel.assembler.iml" filepath="$PROJECT_DIR$/edu.citadel.assembler/edu.citadel.assembler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/edu.citadel.compiler/edu.citadel.compiler.iml" filepath="$PROJECT_DIR$/edu.citadel.compiler/edu.citadel.compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/edu.citadel.cprl/edu.citadel.cprl.iml" filepath="$PROJECT_DIR$/edu.citadel.cprl/edu.citadel.cprl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/edu.citadel.cvm/edu.citadel.cvm.iml" filepath="$PROJECT_DIR$/edu.citadel.cvm/edu.citadel.cvm.iml" />
+    </modules>
+  </component>
+</project>
