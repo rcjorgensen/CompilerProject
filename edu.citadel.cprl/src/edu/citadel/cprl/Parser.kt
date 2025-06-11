@@ -46,7 +46,17 @@ class Parser(
      * `initialDecl = constDecl | varDecl | typeDecl .`
      */
     private fun parseInitialDecl() {
-// ...   throw an internal error if the symbol is not one of constRW, varRW, or typeRW
+        try {
+            when (scanner.symbol) {
+                Symbol.constRW -> parseConstDecl()
+                Symbol.varRW -> parseVarDecl()
+                Symbol.typeRW -> parseTypeDecl()
+                else -> throw internalError("Invalid initial declaration")
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -54,7 +64,18 @@ class Parser(
      * `constDecl = "const" constId ":=" literal ";" .`
      */
     private fun parseConstDecl() {
-// ...
+        try {
+            match(Symbol.constRW)
+            val constId = scanner.token
+            match(Symbol.identifier)
+            match(Symbol.assign)
+            parseLiteral()
+            match(Symbol.semicolon)
+            idTable.add(constId, IdType.constantId)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -154,7 +175,26 @@ class Parser(
      *                  "of" typeName ";" .`
      */
     private fun parseArrayTypeDecl() {
-// ...
+        try {
+            match(Symbol.typeRW)
+
+            val typeId = scanner.token
+            match(Symbol.identifier)
+
+            match(Symbol.equals)
+            match(Symbol.arrayRW)
+            match(Symbol.leftBracket)
+            parseConstValue()
+            match(Symbol.rightBracket)
+            match(Symbol.ofRW)
+            parseTypeName()
+            match(Symbol.semicolon)
+
+            idTable.add(typeId, IdType.arrayTypeId)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -191,7 +231,14 @@ class Parser(
      * `fieldDecls = { fieldDecl } .`
      */
     private fun parseFieldDecls() {
-// ...
+        try {
+            while (scanner.symbol != Symbol.rightBrace) {
+                parseFieldDecl()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -199,7 +246,17 @@ class Parser(
      * `fieldDecl = fieldId ":" typeName ";" .`
      */
     private fun parseFieldDecl() {
-// ...
+        try {
+            val fieldId = scanner.token
+            match(Symbol.identifier)
+            match(Symbol.colon)
+            parseTypeName()
+            match(Symbol.semicolon)
+            idTable.add(fieldId, IdType.fieldId)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -207,7 +264,21 @@ class Parser(
      * `stringTypeDecl = "type" typeId "=" "string" "[" intConstValue "]" ";" .`
      */
     private fun parseStringTypeDecl() {
-// ...
+        try {
+            match(Symbol.typeRW)
+            val typeId = scanner.token
+            match(Symbol.identifier)
+            match(Symbol.equals)
+            match(Symbol.stringRW)
+            match(Symbol.leftBracket)
+            parseConstValue()
+            match(Symbol.rightBracket)
+            match(Symbol.semicolon)
+            idTable.add(typeId, IdType.stringTypeId)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -251,7 +322,14 @@ class Parser(
      * `subprogramDecls = { subprogramDecl } .`
      */
     private fun parseSubprogramDecls() {
-// ...
+        try {
+            while (scanner.symbol.isSubprogramDeclStarter()) {
+                parseSubprogramDecl()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -259,7 +337,11 @@ class Parser(
      * `subprogramDecl = procedureDecl | functionDecl .`
      */
     private fun parseSubprogramDecl() {
-// ...   throw an internal error if the symbol is not one of procRW or funRW
+        when (scanner.symbol) {
+            Symbol.procRW -> parseProcedureDecl()
+            Symbol.funRW -> parseFunctionDecl()
+            else -> throw internalError("Invalid subprogram declaration")
+        }
     }
 
     /**
@@ -302,7 +384,34 @@ class Parser(
      *                 "{" initialDecls statements "}" .`
      */
     private fun parseFunctionDecl() {
-// ...
+        try {
+            match(Symbol.funRW)
+            val funId = scanner.token
+            match(Symbol.identifier)
+            idTable.add(funId, IdType.functionId)
+            match(Symbol.leftParen)
+
+            try {
+                idTable.openScope(ScopeLevel.LOCAL)
+
+                if (scanner.symbol.isParameterDeclStarter())
+                    parseFormalParameters()
+
+                match(Symbol.rightParen)
+                match(Symbol.colon)
+                parseTypeName()
+                match(Symbol.leftBrace)
+                parseInitialDecls()
+                parseStatements()
+            } finally {
+                idTable.closeScope()
+            }
+
+            match(Symbol.rightBrace)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -310,7 +419,17 @@ class Parser(
      * `formalParameters = parameterDecl { "," parameterDecl } .`
      */
     private fun parseFormalParameters() {
-// ...
+        try {
+            parseParameterDecl()
+
+            while (scanner.symbol == Symbol.comma) {
+                matchCurrentSymbol()
+                parseParameterDecl()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -318,7 +437,19 @@ class Parser(
      * `parameterDecl = [ "var" ] paramId ":" typeName .`
      */
     private fun parseParameterDecl() {
-// ...
+        try {
+            if (scanner.symbol == Symbol.varRW) {
+                matchCurrentSymbol()
+            }
+            val paramId = scanner.token
+            match(Symbol.identifier)
+            idTable.add(paramId, IdType.variableId)
+            match(Symbol.colon)
+            parseTypeName()
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -326,7 +457,14 @@ class Parser(
      * `statements = { statement } .`
      */
     private fun parseStatements() {
-// ...
+        try {
+            while (scanner.symbol.isStmtStarter()) {
+                parseStatement()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -349,23 +487,37 @@ class Parser(
                 val idType = idTable[idStr]
 
                 if (idType != null) {
-                    if (idType == IdType.variableId)
-                        parseAssignmentStmt()
-                    else if (idType == IdType.procedureId)
-                        parseProcedureCallStmt()
-                    else
-                        throw error("Identifier \"$idStr\" cannot start a statement.")
+                    when (idType) {
+                        IdType.variableId -> parseAssignmentStmt()
+                        IdType.procedureId -> parseProcedureCallStmt()
+                        else -> throw error("Identifier \"$idStr\" cannot start a statement.")
+                    }
                 } else {
                     // make parsing decision using lookahead symbol
-// ...   Big Hint: Read the book!
+                    val symbol2 = scanner.lookahead(2).symbol
+                    when (symbol2) {
+                        Symbol.leftParen -> parseProcedureCallStmt()
+                        in setOf(Symbol.assign, Symbol.leftBracket, Symbol.dot) -> parseAssignmentStmt()
+                        else -> throw error("Invalid statement.")
+                    }
                 }
             } else if (symbol == Symbol.leftBrace)
                 parseCompoundStmt()
             else if (symbol == Symbol.ifRW)
-                parseIfStmt();
+                parseIfStmt()
             else if (symbol == Symbol.loopRW || symbol == Symbol.whileRW)
-                parseLoopStmt();
-// ...
+                parseLoopStmt()
+            else if (symbol == Symbol.exitRW)
+                parseExitStmt()
+            else if (symbol == Symbol.readRW)
+                parseReadStmt()
+            else if (symbol == Symbol.writeRW)
+                parseWriteStmt()
+            else if (symbol == Symbol.writelnRW)
+                parseWritelnStmt()
+            else if (symbol == Symbol.returnRW)
+                parseReturnStmt()
+            else throw internalError("Invalid statement.")
         } catch (e: ParserException) {
             errorHandler.reportError(e)
             recover(emptySet)
@@ -377,7 +529,15 @@ class Parser(
      * `assignmentStmt = variable ":=" expression ";" .`
      */
     private fun parseAssignmentStmt() {
-// ...
+        try {
+            parseVariable()
+            match(Symbol.assign)
+            parseExpression()
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -385,7 +545,14 @@ class Parser(
      * `compoundStmt = "{" statements "}" .`
     ` */
     private fun parseCompoundStmt() {
-// ...
+        try {
+            match(Symbol.leftBrace)
+            parseStatements()
+            match(Symbol.rightBrace)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -393,7 +560,19 @@ class Parser(
      * `ifStmt = "if" booleanExpr "then" statement  [ "else" statement ] .`
      */
     private fun parseIfStmt() {
-// ...
+        try {
+            match(Symbol.ifRW)
+            parseExpression()
+            match(Symbol.thenRW)
+            parseStatement()
+            if (scanner.symbol == Symbol.elseRW) {
+                matchCurrentSymbol()
+                parseStatement()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -401,7 +580,17 @@ class Parser(
      * `loopStmt = [ "while" booleanExpr ] "loop" statement .`
      */
     private fun parseLoopStmt() {
-// ...
+        try {
+            if (scanner.symbol == Symbol.whileRW) {
+                matchCurrentSymbol()
+                parseExpression()
+            }
+            match(Symbol.loopRW)
+            parseStatement()
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -409,7 +598,17 @@ class Parser(
      * `exitStmt = "exit" [ "when" booleanExpr ] ";" .`
      */
     private fun parseExitStmt() {
-// ...
+        try {
+            match(Symbol.exitRW)
+            if (scanner.symbol == Symbol.whenRW) {
+                matchCurrentSymbol()
+                parseExpression()
+            }
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -417,7 +616,14 @@ class Parser(
      * `readStmt = "read" variable ";" .`
      */
     private fun parseReadStmt() {
-// ...
+        try {
+            match(Symbol.readRW)
+            parseVariable()
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -425,7 +631,14 @@ class Parser(
      * `writeStmt = "write" expressions ";" .`
      */
     private fun parseWriteStmt() {
-// ...
+        try {
+            match(Symbol.writeRW)
+            parseExpressions()
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -433,7 +646,16 @@ class Parser(
      * `expressions = expression { "," expression } .`
      */
     private fun parseExpressions() {
-// ...
+        try {
+            parseExpression()
+            while (scanner.symbol == Symbol.comma) {
+                matchCurrentSymbol()
+                parseExpression()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -460,7 +682,19 @@ class Parser(
      *  actualParameters = expressions .`
      */
     private fun parseProcedureCallStmt() {
-// ...
+        try {
+            match(Symbol.identifier)
+            match(Symbol.leftParen)
+
+            if (scanner.symbol.isExprStarter())
+                parseExpressions()
+
+            match(Symbol.rightParen)
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -468,7 +702,17 @@ class Parser(
      * `returnStmt = "return" [ expression ] ";" .`
      */
     private fun parseReturnStmt() {
-// ...
+        try {
+            match(Symbol.returnRW)
+
+            if (scanner.symbol.isExprStarter())
+                parseExpression()
+
+            match(Symbol.semicolon)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -501,12 +745,12 @@ class Parser(
         while (scanner.symbol.isSelectorStarter()) {
             if (scanner.symbol == Symbol.leftBracket) {
                 // parse index expression
-                match(Symbol.leftBracket)
+                matchCurrentSymbol()
                 parseExpression()
                 match(Symbol.rightBracket)
             } else if (scanner.symbol == Symbol.dot) {
                 // parse field expression
-                match(Symbol.dot)
+                matchCurrentSymbol()
                 match(Symbol.identifier)
             }
         }
@@ -531,10 +775,15 @@ class Parser(
      *  logicalOp = "and" | "or" .`
      */
     private fun parseExpression() {
-        parseRelation()
-        while (scanner.symbol.isLogicalOperator()) {
-            matchCurrentSymbol()
+        try {
             parseRelation()
+            while (scanner.symbol.isLogicalOperator()) {
+                matchCurrentSymbol()
+                parseRelation()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
         }
     }
 
@@ -544,7 +793,16 @@ class Parser(
      *  relationalOp = "=" | "!=" | "<" | "<=" | ">" | ">=" .`
      */
     private fun parseRelation() {
-// ...
+        try {
+            parseSimpleExpr()
+            if (scanner.symbol.isRelationalOperator()) {
+                matchCurrentSymbol()
+                parseSimpleExpr()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -554,7 +812,19 @@ class Parser(
      *  addingOp = "+" | "-" .`
      */
     private fun parseSimpleExpr() {
-// ...
+        try {
+            if (scanner.symbol.isSignOperator()) {
+                matchCurrentSymbol()
+            }
+            parseTerm()
+            while (scanner.symbol.isAddingOperator()) {
+                matchCurrentSymbol()
+                parseTerm()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -563,7 +833,16 @@ class Parser(
      *  multiplyingOp = "*" | "/" | "mod" .`
      */
     private fun parseTerm() {
-// ...
+        try {
+            parseFactor()
+            while (scanner.symbol.isMultiplyingOperator()) {
+                matchCurrentSymbol()
+                parseFactor()
+            }
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -619,7 +898,17 @@ class Parser(
      * `constValue = literal | constId .`
      */
     private fun parseConstValue() {
-// ...
+        try {
+            if (scanner.symbol.isLiteral())
+                parseLiteral()
+            else if (scanner.symbol == Symbol.identifier)
+                matchCurrentSymbol()
+            else
+                throw error("Invalid constant.")
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     /**
@@ -641,7 +930,16 @@ class Parser(
      *  actualParameters = expressions .`
      */
     private fun parseFunctionCallExpr() {
-// ...
+        try {
+            match(Symbol.identifier)
+            match(Symbol.leftParen)
+            if (scanner.symbol.isExprStarter())
+                parseExpressions()
+            match(Symbol.rightParen)
+        } catch (e: ParserException) {
+            errorHandler.reportError(e)
+            recover(emptySet)
+        }
     }
 
     // Utility parsing methods
