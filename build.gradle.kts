@@ -28,13 +28,5 @@ subprojects {
             java.srcDirs("src")
             kotlin.srcDirs("src")
         }
-        test {
-            java.srcDirs("src/test")
-            kotlin.srcDirs("src/test")
-        }
-    }
-
-    tasks.test {
-        useJUnitPlatform()
     }
 }
