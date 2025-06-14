@@ -1,6 +1,7 @@
 package edu.citadel.cprl
 
 import edu.citadel.compiler.ParserException
+import edu.citadel.cprl.ast.Declaration
 
 /**
  * The identifier table (also known as a symbol table) is used to
@@ -47,18 +48,20 @@ class IdTable {
     }
 
     /**
-     * Add an identifier and its type to the current scope.
+     * Add a declaration to the current scope.
      *
-     * @throws ParserException if the identifier already exists
-     *         in the current scope.
+     * @throws ParserException if the name in the declaration already
+     *         exists in the current scope.
      */
-    fun add(idToken: Token, idType: IdType) {
+    fun add(decl: Declaration) {
+        val idToken = decl.idToken
+
         // assumes that idToken is an identifier token
         assert(idToken.symbol == Symbol.identifier)
         { "IdTable.add(): The token in the declaration is not an identifier." }
 
         val scope = table[currentLevel]
-        val oldDecl = scope.put(idToken.text, idType)
+        val oldDecl = scope.put(idToken.text, decl)
 
         // check that the identifier has not been defined previously
         if (oldDecl != null) {
@@ -69,20 +72,20 @@ class IdTable {
     }
 
     /**
-     * Returns the identifier type associated with the identifier name
+     * Returns the declaration associated with the identifier name
      * (type String).  Returns null if the identifier is not found.
      * Searches enclosing scopes if necessary.
      */
-    operator fun get(idStr: String): IdType? {
-        var idType: IdType? = null
+    operator fun get(idStr: String): Declaration? {
+        var decl: Declaration? = null
         var level = currentLevel
 
-        while (level >= 0 && idType == null) {
+        while (level >= 0 && decl == null) {
             val scope = table[level]
-            idType = scope[idStr]
+            decl = scope[idStr]
             --level
         }
 
-        return idType
+        return decl
     }
 }
