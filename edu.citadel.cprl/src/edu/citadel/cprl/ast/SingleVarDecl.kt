@@ -14,30 +14,27 @@ import edu.citadel.cprl.Type
  * @constructor Construct a single variable declaration with its identifier,
  *              type, initial value, and scope level.
  */
-class SingleVarDecl(identifier : Token, varType : Type,
-                    private  val initialValue : ConstValue?,
-                    override val scopeLevel   : ScopeLevel)
-    : InitialDecl(identifier, varType), VariableDecl
-  {
+class SingleVarDecl(
+    identifier: Token, varType: Type,
+    private val initialValue: ConstValue?,
+    override val scopeLevel: ScopeLevel,
+) : InitialDecl(identifier, varType), VariableDecl {
     override var relAddr = 0   // relative address for the variable
-                               // introduced by this declaration
+    // introduced by this declaration
 
     /**
      * The size (number of bytes) associated with this single variable declaration,
      * which is simply the number of bytes associated with its type.
      */
-    override val size : Int
+    override val size: Int
         get() = type.size
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
         // nothing to do for now
-      }
+    }
 
-    override fun emit()
-      {
-        if (initialValue != null)
-          {
+    override fun emit() {
+        if (initialValue != null) {
             if (scopeLevel == ScopeLevel.GLOBAL)
                 emit("LDGADDR $relAddr")
             else
@@ -45,6 +42,6 @@ class SingleVarDecl(identifier : Token, varType : Type,
 
             initialValue.emit()
             emitStoreInst(initialValue.type)
-          }
-      }
-  }
+        }
+    }
+}

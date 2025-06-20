@@ -5,15 +5,12 @@ package edu.citadel.cprl.ast
  *
  * @property statements the list of statements in the compound statement
  */
-class CompoundStmt(val statements : List<Statement>) : Statement()
-  {
-    override fun checkConstraints()
-      {
+class CompoundStmt(val statements: List<Statement>) : Statement() {
+    override fun checkConstraints() {
 // ...
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
 // ...
-      }
-  }
+    }
+}

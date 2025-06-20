@@ -7,15 +7,12 @@ import edu.citadel.compiler.Position
  * It is returned from parsing statements as an alternative to
  * returning null when parsing errors are encountered.
  */
-object EmptyExpression : Expression(Position())
-  {
-    override fun checkConstraints()
-      {
+object EmptyExpression : Expression(Position()) {
+    override fun checkConstraints() {
         // nothing to check
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit
-      }
-  }
+    }
+}

@@ -1,8 +1,5 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
-import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
 
@@ -14,26 +11,22 @@ import edu.citadel.cprl.Type
  * @constructor Construct a multiplying expression with the operator
  *              ("*", "/", or "mod") and the two operands.
  */
-class MultiplyingExpr(leftOperand : Expression, operator : Token, rightOperand : Expression)
-    : BinaryExpr(leftOperand, operator, rightOperand)
-  {
+class MultiplyingExpr(leftOperand: Expression, operator: Token, rightOperand: Expression) :
+    BinaryExpr(leftOperand, operator, rightOperand) {
     /**
      * Initialize the type of the expression to Integer.
      */
-    init
-      {
+    init {
         type = Type.Integer
         assert(operator.symbol.isMultiplyingOperator())
-          { "MultiplyingExpr : operator is not a multiplying operator." }
-      }
+        { "MultiplyingExpr : operator is not a multiplying operator." }
+    }
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
 // ...
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
 // ...
-      }
-  }
+    }
+}

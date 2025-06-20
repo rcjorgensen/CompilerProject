@@ -7,15 +7,12 @@ import edu.citadel.cprl.Token
  * It is returned from parsing subprogram declarations as an alternative to
  * returning null when parsing errors are encountered.
  */
-object EmptySubprogramDecl : SubprogramDecl(Token())
-  {
-    override fun checkConstraints()
-      {
+object EmptySubprogramDecl : SubprogramDecl(Token()) {
+    override fun checkConstraints() {
         // nothing to check
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit
-      }
-  }
+    }
+}

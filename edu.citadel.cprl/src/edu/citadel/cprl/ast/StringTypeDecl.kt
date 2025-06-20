@@ -1,10 +1,7 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
-import edu.citadel.cprl.Token
-import edu.citadel.cprl.Type
 import edu.citadel.cprl.StringType
+import edu.citadel.cprl.Token
 
 /**
  * The abstract syntax tree node for a string type declaration.
@@ -15,11 +12,9 @@ import edu.citadel.cprl.StringType
  * @param typeId the identifier token containing the string type name
  * @property capacity the maximum number of characters in the string
  */
-class StringTypeDecl(typeId : Token, val capacity : ConstValue)
-    : InitialDecl(typeId, StringType(typeId.text, capacity.intValue))
-  {
-    override fun checkConstraints()
-      {
+class StringTypeDecl(typeId: Token, val capacity: ConstValue) :
+    InitialDecl(typeId, StringType(typeId.text, capacity.intValue)) {
+    override fun checkConstraints() {
 // ...
-      }
-  }
+    }
+}

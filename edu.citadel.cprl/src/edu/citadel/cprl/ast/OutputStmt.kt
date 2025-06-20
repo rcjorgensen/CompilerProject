@@ -11,48 +11,40 @@ import edu.citadel.cprl.Type
  * @constructor Construct an output statement with the list of expressions
  *              and isWriteln flag.
  */
-class OutputStmt(private val expressions : List<Expression>,
-                 private val isWriteln   : Boolean = false)
-    : Statement()
-  {
-    override fun checkConstraints()
-      {
-        try
-          {
-            for (expr in expressions)
-              {
+class OutputStmt(
+    private val expressions: List<Expression>,
+    private val isWriteln: Boolean = false,
+) : Statement() {
+    override fun checkConstraints() {
+        try {
+            for (expr in expressions) {
                 expr.checkConstraints()
 
                 if (expr.type != Type.Integer && expr.type != Type.Boolean
-                    && expr.type != Type.Char && expr.type !is StringType)
-                  {
+                    && expr.type != Type.Char && expr.type !is StringType
+                ) {
                     val errorMsg = "Output supported only for scalar types and strings.";
                     throw error(expr.position, errorMsg)
-                  }
-              }
-          }
-        catch (e : ConstraintException)
-          {
+                }
+            }
+        } catch (e: ConstraintException) {
             errorHandler.reportError(e)
-          }
-      }
+        }
+    }
 
-    override fun emit()
-      {
-        for (expr in expressions)
-          {
+    override fun emit() {
+        for (expr in expressions) {
             expr.emit()
 
-            when (val exprType = expr.type)
-              {
-                Type.Integer  -> emit("PUTINT")
-                Type.Boolean  -> emit("PUTBYTE")
-                Type.Char     -> emit("PUTCH")
+            when (val exprType = expr.type) {
+                Type.Integer -> emit("PUTINT")
+                Type.Boolean -> emit("PUTBYTE")
+                Type.Char -> emit("PUTCH")
                 is StringType -> emit("PUTSTR ${exprType.capacity}")
-              }
-          }
+            }
+        }
 
         if (isWriteln)
             emit("PUTEOL")
-      }
-  }
+    }
+}

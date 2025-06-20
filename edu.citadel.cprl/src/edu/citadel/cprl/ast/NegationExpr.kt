@@ -1,7 +1,5 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -14,22 +12,17 @@ import edu.citadel.cprl.Type
  * @constructor Construct a negation expression with the specified
  *              operator ("-") and operand.
  */
-class NegationExpr(operator : Token, operand : Expression)
-    : UnaryExpr(operator, operand)
-  {
-    init
-      {
+class NegationExpr(operator: Token, operand: Expression) : UnaryExpr(operator, operand) {
+    init {
         type = Type.Integer
-        assert(operator.symbol == Symbol.minus) { "Operator is not \"-\" operator." }
-      }
+        assert(operator.symbol == Symbol.minus || operator.symbol == Symbol.plus) { "Operator is not \"-\" or \"+\" operator." }
+    }
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
 // ...
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
 // ...
-      }
-  }
+    }
+}

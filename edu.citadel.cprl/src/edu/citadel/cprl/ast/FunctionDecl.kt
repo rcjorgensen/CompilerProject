@@ -1,8 +1,5 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
-import edu.citadel.cprl.ArrayType
 import edu.citadel.cprl.Token
 
 /**
@@ -10,18 +7,16 @@ import edu.citadel.cprl.Token
  *
  * @constructor Construct a function declaration with its name (an identifier).
  */
-class FunctionDecl(funcId : Token) : SubprogramDecl(funcId)
-  {
+class FunctionDecl(funcId: Token) : SubprogramDecl(funcId) {
     /**
      * The relative address of the function return value.
      */
-    val relAddr : Int
+    val relAddr: Int
         get() = -type.size - paramLength
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
 // ...   call super.checkConstraints() before checking any additional constraints
-      }
+    }
 
     /**
      * Returns true if the specified list of statements contains at least one
@@ -33,17 +28,15 @@ class FunctionDecl(funcId : Token) : SubprogramDecl(funcId)
      *                    or a loop statement), then the nested statements are
      *                    also checked for a return statement.
      */
-    private fun hasReturnStmt(statements : List<Statement>) : Boolean
-      {
+    private fun hasReturnStmt(statements: List<Statement>): Boolean {
         // Check that we have at least one return statement.
-        for (statement in statements)
-          {
+        for (statement in statements) {
             if (hasReturnStmt(statement))
                 return true
-          }
+        }
 
         return false
-      }
+    }
 
     /**
      * Returns true if the specified statement is a return statement or contains
@@ -54,13 +47,17 @@ class FunctionDecl(funcId : Token) : SubprogramDecl(funcId)
      *                  a compound statement, or a loop statement), then the nested
      *                  statements are also checked for a return statement.
      */
-    private fun hasReturnStmt(statement : Statement) : Boolean
-      {
-// ...
-      }
+    private fun hasReturnStmt(statement: Statement): Boolean {
+        return when (statement) {
+            is ReturnStmt -> true
+            is IfStmt -> hasReturnStmt(statement.thenStmt) || statement.elseStmt != null && hasReturnStmt(statement.elseStmt)
+            is CompoundStmt -> statement.statements.any { statement -> hasReturnStmt(statement) }
+            is LoopStmt -> hasReturnStmt(statement.statement)
+            else -> false
+        }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
 // ...
-      }
-  }
+    }
+}

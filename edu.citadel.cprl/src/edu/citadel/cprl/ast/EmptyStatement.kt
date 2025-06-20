@@ -5,15 +5,12 @@ package edu.citadel.cprl.ast
  * It is returned from parsing statements as an alternative to
  * returning null when parsing errors are encountered.
  */
-object EmptyStatement : Statement()
-  {
-    override fun checkConstraints()
-      {
+object EmptyStatement : Statement() {
+    override fun checkConstraints() {
         // nothing to check
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit
-      }
-  }
+    }
+}

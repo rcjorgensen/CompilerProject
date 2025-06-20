@@ -11,9 +11,7 @@ import edu.citadel.cprl.Type
  *              type, and a boolean value that indicates if it is a
  *              variable parameter declaration.
  */
-class ParameterDecl(paramId : Token, type : Type, val isVarParam : Boolean)
-    : Declaration(paramId, type), VariableDecl
-  {
+class ParameterDecl(paramId: Token, type: Type, val isVarParam: Boolean) : Declaration(paramId, type), VariableDecl {
     override var relAddr = 0      // relative address for this declaration
 
     override val scopeLevel = ScopeLevel.LOCAL   // always LOCAL for a parameter
@@ -24,17 +22,15 @@ class ParameterDecl(paramId : Token, type : Type, val isVarParam : Boolean)
      * with its type.  For variable parameters, the size is the number of bytes
      * needed for a memory address.
      */
-    override val size : Int
+    override val size: Int
         get() = if (isVarParam) Type.Address.size else type.size
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
         assert(type != Type.UNKNOWN && type != Type.none)
-          { "Invalid CPRL type in parameter declaration." }
-      }
+        { "Invalid CPRL type in parameter declaration." }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit for parameter declarations
-      }
-  }
+    }
+}

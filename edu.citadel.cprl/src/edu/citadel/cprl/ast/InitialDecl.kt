@@ -8,14 +8,11 @@ import edu.citadel.cprl.Type
  *
  * @constructor Construct an initial declaration with its identifier and type.
  */
-abstract class InitialDecl(identifier : Token, declType : Type)
-    : Declaration(identifier, declType)
-  {
+abstract class InitialDecl(identifier: Token, declType: Type) : Declaration(identifier, declType) {
     // Note: Many initial declarations do not require code generation.
     // A default implementation is provided for convenience.
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit for most initial declarations
-      }
-  }
+    }
+}

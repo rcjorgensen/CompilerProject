@@ -12,11 +12,9 @@ import edu.citadel.cprl.Token
  * @param typeId the token containing the identifier for the record type name
  * @param fieldDecls the list of field declarations for the record
  */
-class RecordTypeDecl(typeId : Token, val fieldDecls : List<FieldDecl>)
-    : InitialDecl(typeId, RecordType(typeId.text, fieldDecls))
-  {
-    override fun checkConstraints()
-      {
+class RecordTypeDecl(typeId: Token, val fieldDecls: List<FieldDecl>) :
+    InitialDecl(typeId, RecordType(typeId.text, fieldDecls)) {
+    override fun checkConstraints() {
 // ...   Don't forget to compute fieldDecl offsets.
-      }
-  }
+    }
+}

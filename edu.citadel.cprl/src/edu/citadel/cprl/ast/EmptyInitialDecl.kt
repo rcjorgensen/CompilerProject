@@ -8,15 +8,12 @@ import edu.citadel.cprl.Type
  * It is returned from parsing initial declarations as an alternative to
  * returning null when parsing errors are encountered.
  */
-object EmptyInitialDecl : InitialDecl(Token(), Type.UNKNOWN)
-  {
-    override fun checkConstraints()
-      {
+object EmptyInitialDecl : InitialDecl(Token(), Type.UNKNOWN) {
+    override fun checkConstraints() {
         // nothing to check
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit
-      }
-  }
+    }
+}

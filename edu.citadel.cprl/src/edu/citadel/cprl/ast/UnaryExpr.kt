@@ -9,5 +9,4 @@ import edu.citadel.cprl.Token
  *
  * @constructor Construct a unary expression with the specified operator and operand.
  */
-abstract class UnaryExpr(val operator : Token, val operand : Expression)
-    : Expression(operator.position)
+abstract class UnaryExpr(val operator: Token, val operand: Expression) : Expression(operator.position)

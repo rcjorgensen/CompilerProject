@@ -9,19 +9,16 @@ import edu.citadel.cprl.Type
  *
  * @constructor Construct a field expression with its field name.
  */
-class FieldExpr(val fieldId : Token) : Expression(Type.Integer, fieldId.position)
-  {
+class FieldExpr(val fieldId: Token) : Expression(Type.Integer, fieldId.position) {
     // Note: value for fieldDecl is assigned in Variable.checkConstraints()
-    lateinit var fieldDecl : FieldDecl   // nonstructural reference
+    lateinit var fieldDecl: FieldDecl   // nonstructural reference
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
         // nothing to do for now
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         assert(fieldDecl.offset >= 0) { "Invalid value for field offset." }
 // ...
-      }
-  }
+    }
+}

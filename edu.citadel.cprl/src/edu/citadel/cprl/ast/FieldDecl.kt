@@ -10,25 +10,22 @@ import edu.citadel.cprl.Type
  *
  * @constructor Construct a field declaration with its identifier and type.
  */
-class FieldDecl(fieldId : Token, type : Type) : Declaration(fieldId, type)
-  {
+class FieldDecl(fieldId: Token, type: Type) : Declaration(fieldId, type) {
     var offset = 0    // offset for this field within the record; initialized
-                      // to 0 but updated when constructing the record type
+    // to 0 but updated when constructing the record type
 
     /**
      * The size (number of bytes) associated with this field declaration,
      * which is simply the number of bytes associated with its type.
      */
-    val size : Int = type.size
+    val size: Int = type.size
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
         assert(type != Type.UNKNOWN && type != Type.none && type != Type.Address)
-          { "Invalid CPRL type in field declaration." }
-      }
+        { "Invalid CPRL type in field declaration." }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         // nothing to emit for field declarations
-      }
-  }
+    }
+}

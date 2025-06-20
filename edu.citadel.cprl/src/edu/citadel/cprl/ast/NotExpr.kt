@@ -1,7 +1,5 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -12,22 +10,18 @@ import edu.citadel.cprl.Type
  *
  * @constructor Construct a not expression with the specified operator ("not") and operand.
  */
-class NotExpr(operator : Token, operand : Expression) : UnaryExpr(operator, operand)
-  {
-    init
-      {
+class NotExpr(operator: Token, operand: Expression) : UnaryExpr(operator, operand) {
+    init {
         type = Type.Boolean
         assert(operator.symbol == Symbol.notRW)
-          { "Operator is not the reserved word \"not\"." }
-      }
+        { "Operator is not the reserved word \"not\"." }
+    }
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
 // ...
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
 // ...
-      }
-  }
+    }
+}

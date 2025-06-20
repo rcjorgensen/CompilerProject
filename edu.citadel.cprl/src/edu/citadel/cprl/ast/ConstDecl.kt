@@ -1,8 +1,5 @@
 package edu.citadel.cprl.ast
 
-import edu.citadel.compiler.ConstraintException
-
-import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
 
@@ -11,11 +8,8 @@ import edu.citadel.cprl.Type
  *
  * @constructor Construct a constant declaration with its identifier, type, and literal.
  */
-class ConstDecl(identifier : Token, constType : Type, val literal : Token)
-    : InitialDecl(identifier, constType)
-  {
-    override fun checkConstraints()
-      {
+class ConstDecl(identifier: Token, constType: Type, val literal: Token) : InitialDecl(identifier, constType) {
+    override fun checkConstraints() {
 // ...
-      }
-  }
+    }
+}

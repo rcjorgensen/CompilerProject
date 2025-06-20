@@ -10,7 +10,8 @@ import edu.citadel.cprl.Token
  * @constructor Construct a binary expression with its left operand, operator,
  *              and right operand.
  */
-abstract class BinaryExpr(val leftOperand  : Expression,
-                          val operator     : Token,
-                          val rightOperand : Expression)
-    : Expression(operator.position)
+abstract class BinaryExpr(
+    val leftOperand: Expression,
+    val operator: Token,
+    val rightOperand: Expression,
+) : Expression(operator.position)

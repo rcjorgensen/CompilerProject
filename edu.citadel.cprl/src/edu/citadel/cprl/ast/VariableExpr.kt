@@ -10,14 +10,11 @@ package edu.citadel.cprl.ast
  *
  * @constructor Construct a variable expression from a variable.
  */
-class VariableExpr(variable : Variable)
-    : Variable(variable.decl, variable.position, variable.selectorExprs)
-  {
+class VariableExpr(variable: Variable) : Variable(variable.decl, variable.position, variable.selectorExprs) {
     // inherited checkConstraints() is sufficient
 
-    override fun emit()
-      {
+    override fun emit() {
         super.emit()         // leaves address of variable on top of stack
         emitLoadInst(type)   // replaces address by value at that address
-      }
-  }
+    }
+}

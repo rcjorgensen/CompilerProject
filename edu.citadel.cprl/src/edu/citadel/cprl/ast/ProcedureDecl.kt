@@ -7,12 +7,10 @@ import edu.citadel.cprl.Token
  *
  * @constructor Construct a procedure declaration with its name (an identifier).
  */
-class ProcedureDecl(procId : Token) : SubprogramDecl(procId)
-  {
+class ProcedureDecl(procId: Token) : SubprogramDecl(procId) {
     // inherited checkConstraints() is sufficient
 
-    override fun emit()
-      {
+    override fun emit() {
         setRelativeAddresses()
 
         emitLabel(subprogramLabel)
@@ -28,5 +26,5 @@ class ProcedureDecl(procId : Token) : SubprogramDecl(procId)
             statement.emit()
 
         emit("RET $paramLength")
-      }
-  }
+    }
+}

@@ -1,8 +1,6 @@
 package edu.citadel.cprl.ast
 
 import edu.citadel.compiler.CodeGenException
-import edu.citadel.compiler.ConstraintException
-
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -15,60 +13,52 @@ import edu.citadel.cprl.Type
  * @constructor Construct a relational expression with the operator
  *              ("=", "<=", etc.) and the two operands.
  */
-class RelationalExpr(leftOperand : Expression, operator : Token, rightOperand : Expression)
-    : BinaryExpr(leftOperand, operator, rightOperand)
-  {
+class RelationalExpr(leftOperand: Expression, operator: Token, rightOperand: Expression) :
+    BinaryExpr(leftOperand, operator, rightOperand) {
     // labels used during code generation
-    private val L1 : String = getNewLabel()   // label at start of right operand
-    private val L2 : String = getNewLabel()   // label at end of the relational expression
+    private val L1: String = getNewLabel()   // label at start of right operand
+    private val L2: String = getNewLabel()   // label at end of the relational expression
 
     /**
      * Initialize the type of the expression to Boolean.
      */
-    init
-      {
+    init {
         type = Type.Boolean
         assert(operator.symbol.isRelationalOperator())
-          { "Operator is not a relational operator." }
-      }
+        { "Operator is not a relational operator." }
+    }
 
-    override fun checkConstraints()
-      {
+    override fun checkConstraints() {
 // ...
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         emitBranch(false, L1)
         emit("LDCB $TRUE")    // push true back on the stack
         emit("BR $L2")        // jump over code to emit false
         emitLabel(L1)
         emit("LDCB $FALSE")   // push false onto the stack
         emitLabel(L2)
-      }
+    }
 
-    override fun emitBranch(condition : Boolean, label : String)
-      {
+    override fun emitBranch(condition: Boolean, label: String) {
         emitOperands()
 
-        when (operator.symbol)
-          {
-            Symbol.equals         -> emit(if (condition) "BE $label"  else "BNE $label")
-            Symbol.notEqual       -> emit(if (condition) "BNE $label" else "BE $label")
-            Symbol.lessThan       -> emit(if (condition) "BL $label"  else "BGE $label")
-            Symbol.lessOrEqual    -> emit(if (condition) "BLE $label" else "BG $label")
-            Symbol.greaterThan    -> emit(if (condition) "BG $label"  else "BLE $label")
+        when (operator.symbol) {
+            Symbol.equals -> emit(if (condition) "BE $label" else "BNE $label")
+            Symbol.notEqual -> emit(if (condition) "BNE $label" else "BE $label")
+            Symbol.lessThan -> emit(if (condition) "BL $label" else "BGE $label")
+            Symbol.lessOrEqual -> emit(if (condition) "BLE $label" else "BG $label")
+            Symbol.greaterThan -> emit(if (condition) "BG $label" else "BLE $label")
             Symbol.greaterOrEqual -> emit(if (condition) "BGE $label" else "BL $label")
-            else ->
-              {
+            else -> {
                 val errorMsg = "Invalid relational operator."
                 throw CodeGenException(operator.position, errorMsg)
-              }
-          }
-      }
+            }
+        }
+    }
 
-    private fun emitOperands()
-      {
+    private fun emitOperands() {
         // Relational operators compare integers only, so we need to make sure
         // that we have enough bytes on the stack.  Pad with zero bytes.
         for (n in 1..Type.Integer.size - leftOperand.type.size)
@@ -80,5 +70,5 @@ class RelationalExpr(leftOperand : Expression, operator : Token, rightOperand : 
             emit("LDCB 0")
 
         rightOperand.emit()
-      }
-  }
+    }
+}

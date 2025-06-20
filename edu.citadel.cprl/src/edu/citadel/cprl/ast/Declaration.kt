@@ -11,12 +11,11 @@ import edu.citadel.cprl.Type
  * @constructor Construct a declaration with its identifier token and type.  If not
  *              specified, the type is initialized to Type.none (e.g. for procedures).
  */
-abstract class Declaration(val idToken : Token, var type : Type = Type.none) : AST()
-  {
+abstract class Declaration(val idToken: Token, var type: Type = Type.none) : AST() {
     /**
      * The position of this declaration, which is simply the
      * position of the identifier token.
      */
-    val position : Position
+    val position: Position
         get() = idToken.position
-  }
+}

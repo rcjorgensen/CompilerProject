@@ -2,12 +2,7 @@ package edu.citadel.cprl.ast
 
 import edu.citadel.compiler.ConstraintException
 import edu.citadel.compiler.Position
-
-import edu.citadel.cprl.Type
-import edu.citadel.cprl.ArrayType
-import edu.citadel.cprl.RecordType
-import edu.citadel.cprl.StringType
-import edu.citadel.cprl.ScopeLevel
+import edu.citadel.cprl.*
 
 /**
  * The abstract syntax tree node for a variable, which is any named variable
@@ -16,32 +11,28 @@ import edu.citadel.cprl.ScopeLevel
  * @constructor Construct a variable with a reference to its declaration,
  *              its position, and a list of selector expressions.
  */
-open class Variable(val decl : VariableDecl,   // nonstructural reference
-                    position : Position, val selectorExprs : List<Expression>)
-    : Expression(decl.type, position)
-  {
+open class Variable(
+    val decl: VariableDecl,   // nonstructural reference
+    position: Position, val selectorExprs: List<Expression>,
+) : Expression(decl.type, position) {
     /**
      * Construct a variable that corresponds to a variable expression.
      */
-    constructor(varExpr : VariableExpr)
-        : this(varExpr.decl, varExpr.position, varExpr.selectorExprs)
+    constructor(varExpr: VariableExpr)
+            : this(varExpr.decl, varExpr.position, varExpr.selectorExprs)
 
-    override fun checkConstraints()
-      {
-        try
-          {
+    override fun checkConstraints() {
+        try {
             assert(decl is SingleVarDecl || decl is ParameterDecl)
-              { "Declaration is not a variable." }
+            { "Declaration is not a variable." }
 
-            for (expr in selectorExprs)
-              {
+            for (expr in selectorExprs) {
                 expr.checkConstraints()
 
                 // Each selector expression must correspond to
                 // an array type, a record type, or a string type.
 
-                if (type is ArrayType)
-                  {
+                if (type is ArrayType) {
                     // Applying the selector effectively changes the
                     // variable's type to the element type of the array
                     val arrayType = type as ArrayType
@@ -52,86 +43,67 @@ open class Variable(val decl : VariableDecl,   // nonstructural reference
 
                     // check that the type of the index expression is Integer
 // ...
-                  }
-                else if (type is RecordType)
-                  {
-                    // check that the selector expression is a field expression
-// ...
+                } else if (type is RecordType) {
+                    if (expr is FieldExpr) {
 
-                    // Applying the selector effectively changes the
-                    // variable's type to the type of the field.
-                    val recType   = type as RecordType
-                    val fieldId   = expr.fieldId
-                    val fieldDecl = recType[fieldId.text]
+                        // Applying the selector effectively changes the
+                        // variable's type to the type of the field.
+                        val recType = type as RecordType
+                        val fieldId = expr.fieldId
+                        val fieldDecl = recType[fieldId.text]
 
-                    if (fieldDecl != null)
-                      {
-                        expr.fieldDecl = fieldDecl
-                        type = fieldDecl.type
-                      }
-                    else
-                      {
-                        val errorMsg = "\"${fieldId.text}\" is not a " +
-                                       "valid field name for $recType."
-                        throw error(fieldId.position, errorMsg)
-                      }
-                  }
-                else if (type is StringType)
-                  {
+                        if (fieldDecl != null) {
+                            expr.fieldDecl = fieldDecl
+                            type = fieldDecl.type
+                        } else {
+                            val errorMsg = "\"${fieldId.text}\" is not a " +
+                                    "valid field name for $recType."
+                            throw error(fieldId.position, errorMsg)
+                        }
+                    }
+                } else if (type is StringType) {
                     // Selector can be field expression .length (type Integer)
                     // or an index expression for the characters (type Char).
 
-                    if (expr is FieldExpr)
-                      {
+                    if (expr is FieldExpr) {
                         // Applying length field selector effectively changes the
                         // variable's type to Integer.
                         type = Type.Integer
 
                         // check that the field identifier is "length"
                         val fieldId = expr.fieldId
-                        if (fieldId.text != "length")
-                          {
+                        if (fieldId.text != "length") {
                             val errorMsg = "Field name must be \"length\" for strings."
                             throw error(fieldId.position, errorMsg)
-                          }
-                      }
-                    else
-                      {
+                        }
+                    } else {
                         // Applying an index selector effectively changes the
                         // variable's type to Char.
                         type = Type.Char
 
                         // must be an index expression; check that the type is Integer
-                        if (expr.type != Type.Integer)
-                          {
+                        if (expr.type != Type.Integer) {
                             val errorMsg = "Index expression must have type Integer."
                             throw error(expr.position, errorMsg)
-                          }
-                      }
-                  }
-                else
-                  {
+                        }
+                    }
+                } else {
                     val errorMsg = "Selector expression not allowed; " +
-                                   "not an array, record, or string."
+                            "not an array, record, or string."
                     throw error(expr.position, errorMsg)
-                  }
-              }
-          }
-        catch (e : ConstraintException)
-          {
+                }
+            }
+        } catch (e: ConstraintException) {
             errorHandler.reportError(e)
-          }
-      }
+        }
+    }
 
-    override fun emit()
-      {
-        if (decl is ParameterDecl && decl.isVarParam)
-          {
+    override fun emit() {
+        if (decl is ParameterDecl && decl.isVarParam) {
             // address of actual parameter is value of var parameter
             emit("LDLADDR ${decl.relAddr}")
             emit("LOADW")
-          }
-        else if (decl.scopeLevel == ScopeLevel.GLOBAL)
+        } else if (decl.scopeLevel == ScopeLevel.GLOBAL)
             emit("LDGADDR ${decl.relAddr}")
         else
             emit("LDLADDR ${decl.relAddr}")
@@ -140,10 +112,8 @@ open class Variable(val decl : VariableDecl,   // nonstructural reference
         // top of the stack.  We need to replace it by the sum base address + offset
         var type = decl.type
 
-        for (expr in selectorExprs)
-          {
-            if (type is ArrayType)
-              {
+        for (expr in selectorExprs) {
+            if (type is ArrayType) {
                 expr.emit()   // emit the index
 
                 // multiply by size of array base type to get offset
@@ -156,28 +126,21 @@ open class Variable(val decl : VariableDecl,   // nonstructural reference
                 emit("ADD")
 
                 type = type.elementType
-              }
-            else if (type is RecordType)
-              {
+            } else if (type is RecordType) {
                 expr as FieldExpr
 
-                if (expr.fieldDecl.offset != 0)
-                  {
+                if (expr.fieldDecl.offset != 0) {
                     // add offset to the base address
 // ...
-                  }
+                }
 
                 type = expr.fieldDecl.type
-              }
-            else if (type is StringType)
-              {
-                if (expr is FieldExpr)
-                  {
+            } else if (type is StringType) {
+                if (expr is FieldExpr) {
                     // The only allowed field expression for strings is length, which
                     // is at offset 0; we don't need to emit code for the offset.
-                  }
-                else   // selector expression must be an index expression
-                  {
+                } else   // selector expression must be an index expression
+                {
                     // skip over length (type Integer)
                     emit("LDCINT ${Type.Integer.size}")
                     emit("ADD")
@@ -192,8 +155,8 @@ open class Variable(val decl : VariableDecl,   // nonstructural reference
 
                     // Note: No code to perform bounds checking for the index to
                     // ensure that the index is >= 0 and < string capacity.
-                  }
-              }
-          }
-      }
-  }
+                }
+            }
+        }
+    }
+}

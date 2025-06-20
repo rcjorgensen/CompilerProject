@@ -14,43 +14,34 @@ import edu.citadel.cprl.Type
  * @constructor Construct an adding expression with the operator ("+" or "-")
  *              and the two operands.
  */
-class AddingExpr(leftOperand : Expression, operator : Token, rightOperand : Expression)
-    : BinaryExpr(leftOperand, operator, rightOperand)
-  {
-    init
-      {
+class AddingExpr(leftOperand: Expression, operator: Token, rightOperand: Expression) :
+    BinaryExpr(leftOperand, operator, rightOperand) {
+    init {
         type = Type.Integer   // initialize type of the expression to Integer
         assert(operator.symbol.isAddingOperator()) { "Operator is not an adding operator." }
-      }
+    }
 
-    override fun checkConstraints()
-      {
-        try
-          {
+    override fun checkConstraints() {
+        try {
             leftOperand.checkConstraints()
             rightOperand.checkConstraints()
 
             // can add/subtract only integers
-            if (leftOperand.type != Type.Integer)
-              {
+            if (leftOperand.type != Type.Integer) {
                 val errorMsg = "Left operand for expression should have type Integer."
                 throw error(leftOperand.position, errorMsg)
-              }
+            }
 
-            if (rightOperand.type != Type.Integer)
-              {
+            if (rightOperand.type != Type.Integer) {
                 val errorMsg = "Right operand for expression should have type Integer."
                 throw error(rightOperand.position, errorMsg)
-              }
-          }
-        catch (e : ConstraintException)
-          {
+            }
+        } catch (e: ConstraintException) {
             errorHandler.reportError(e)
-          }
-      }
+        }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         leftOperand.emit()
         rightOperand.emit()
 
@@ -58,5 +49,5 @@ class AddingExpr(leftOperand : Expression, operator : Token, rightOperand : Expr
             emit("ADD")
         else if (operator.symbol == Symbol.minus)
             emit("SUB")
-      }
-  }
+    }
+}

@@ -14,41 +14,34 @@ import edu.citadel.cprl.Type
  * @constructor Construct a variable declaration with its list of identifier
  *              tokens, type, initial value, and scope level.
  */
-class VarDecl(identifiers : List<Token>, varType : Type,
-              private val initialValue : ConstValue?, scopeLevel : ScopeLevel)
-    : InitialDecl(Token(), varType)
-  {
+class VarDecl(
+    identifiers: List<Token>, varType: Type,
+    private val initialValue: ConstValue?, scopeLevel: ScopeLevel,
+) : InitialDecl(Token(), varType) {
     // the list of single variable declarations for this variable declaration
     val singleVarDecls = ArrayList<SingleVarDecl>(identifiers.size)
 
-    init
-      {
+    init {
         for (id in identifiers)
             singleVarDecls.add(SingleVarDecl(id, varType, initialValue, scopeLevel))
-      }
+    }
 
-    override fun checkConstraints()
-      {
-        try
-          {
+    override fun checkConstraints() {
+        try {
             for (singleVarDecl in singleVarDecls)
                 singleVarDecl.checkConstraints()
 
-            if (initialValue != null && !matchTypes(type, initialValue))
-              {
+            if (initialValue != null && !matchTypes(type, initialValue)) {
                 val errorMsg = "Type mismatch for variable initialization."
                 throw error(initialValue.position, errorMsg)
-              }
-          }
-        catch (e : ConstraintException)
-          {
+            }
+        } catch (e: ConstraintException) {
             errorHandler.reportError(e)
-          }
-      }
+        }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         for (singleVarDecl in singleVarDecls)
             singleVarDecl.emit()
-      }
-  }
+    }
+}

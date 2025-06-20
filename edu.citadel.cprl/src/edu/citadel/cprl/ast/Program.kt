@@ -8,16 +8,14 @@ import edu.citadel.compiler.ConstraintException
  * @constructor Construct a program with the specified initial declarations
  *              and subprogram declarations.
  */
-class Program(private val initialDecls    : List<InitialDecl>    = emptyList(),
-              private val subprogramDecls : List<SubprogramDecl> = emptyList())
-    : AST()
-  {
+class Program(
+    private val initialDecls: List<InitialDecl> = emptyList(),
+    private val subprogramDecls: List<SubprogramDecl> = emptyList(),
+) : AST() {
     private var varLength = 0      // # bytes of all declared variables
 
-    override fun checkConstraints()
-      {
-        try
-          {
+    override fun checkConstraints() {
+        try {
             for (decl in initialDecls)
                 decl.checkConstraints()
 
@@ -28,51 +26,41 @@ class Program(private val initialDecls    : List<InitialDecl>    = emptyList(),
             val decl = idTable["main"]
             if (decl == null)
                 throw error("Program is missing procedure \"main()\".")
-            else if (decl !is ProcedureDecl)
-              {
+            else if (decl !is ProcedureDecl) {
                 val errorMsg = "Identifier \"main\" was not declared as a procedure."
                 throw error(decl.position, errorMsg)
-              }
-            else if (decl.paramLength != 0)
-              {
+            } else if (decl.paramLength != 0) {
                 val errorMsg = "Procedure \"main\" cannot have parameters."
                 throw error(decl.position, errorMsg)
-              }
-          }
-        catch (e : ConstraintException)
-          {
+            }
+        } catch (e: ConstraintException) {
             errorHandler.reportError(e)
-          }
-      }
+        }
+    }
 
     /**
      * Set the relative address (offset) for each variable
      * and compute the length of all variables.
      */
-    private fun setRelativeAddresses()
-      {
+    private fun setRelativeAddresses() {
         // initial relative address is 0 for a program
         var currentAddr = 0
 
-        for (decl in initialDecls)
-          {
-            if (decl is VarDecl)
-              {
+        for (decl in initialDecls) {
+            if (decl is VarDecl) {
                 // set relative address for single variable declarations
-                for (singleVarDecl in decl.singleVarDecls)
-                  {
+                for (singleVarDecl in decl.singleVarDecls) {
                     singleVarDecl.relAddr = currentAddr
                     currentAddr = currentAddr + singleVarDecl.size
-                  }
-              }
-          }
+                }
+            }
+        }
 
         // compute length of all variables
         varLength = currentAddr
-      }
+    }
 
-    override fun emit()
-      {
+    override fun emit() {
         setRelativeAddresses()
 
         // no need to emit PROGRAM instruction if varLength == 0
@@ -87,5 +75,5 @@ class Program(private val initialDecls    : List<InitialDecl>    = emptyList(),
 
         for (decl in subprogramDecls)
             decl.emit()
-      }
-  }
+    }
+}
