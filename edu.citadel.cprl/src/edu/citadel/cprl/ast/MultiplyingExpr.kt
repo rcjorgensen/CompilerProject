@@ -1,6 +1,7 @@
 package edu.citadel.cprl.ast
 
 import edu.citadel.compiler.ConstraintException
+import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
 
@@ -43,6 +44,14 @@ class MultiplyingExpr(leftOperand: Expression, operator: Token, rightOperand: Ex
     }
 
     override fun emit() {
-// ...
+        leftOperand.emit()
+        rightOperand.emit()
+        if (operator.symbol == Symbol.times) {
+            emit("MUL")
+        } else if (operator.symbol == Symbol.divide) {
+            emit("DIV")
+        } else if (operator.symbol == Symbol.modRW) {
+            emit("MOD")
+        }
     }
 }

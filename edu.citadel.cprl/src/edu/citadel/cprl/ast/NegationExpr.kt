@@ -33,6 +33,9 @@ class NegationExpr(operator: Token, operand: Expression) : UnaryExpr(operator, o
     }
 
     override fun emit() {
-// ...
+        operand.emit()
+        if (operator.symbol == Symbol.minus) {
+            emit("NEG")
+        }
     }
 }

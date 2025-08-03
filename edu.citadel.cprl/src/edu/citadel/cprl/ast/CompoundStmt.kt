@@ -18,6 +18,7 @@ class CompoundStmt(val statements: List<Statement>) : Statement() {
     }
 
     override fun emit() {
-// ...
+        for (stmt in statements)
+            stmt.emit()
     }
 }

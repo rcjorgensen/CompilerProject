@@ -32,6 +32,7 @@ class NotExpr(operator: Token, operand: Expression) : UnaryExpr(operator, operan
     }
 
     override fun emit() {
-// ...
+        operand.emit()
+        emit("NOT")
     }
 }

@@ -35,6 +35,13 @@ class LoopStmt : Statement() {
     }
 
     override fun emit() {
-// ...
+        emitLabel(L1)
+
+        whileExpr?.emitBranch(false, L2)
+
+        statement.emit()
+        emit("BR $L1")
+
+        emitLabel(L2)
     }
 }

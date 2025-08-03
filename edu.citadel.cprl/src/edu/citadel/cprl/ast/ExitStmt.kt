@@ -28,6 +28,11 @@ class ExitStmt(
     }
 
     override fun emit() {
-// ...
+        val exitLabel = loopStmt.getExitLabel()
+
+        if (whenExpr != null)
+            whenExpr.emitBranch(true, exitLabel)
+        else
+            emit("BR $exitLabel")
     }
 }

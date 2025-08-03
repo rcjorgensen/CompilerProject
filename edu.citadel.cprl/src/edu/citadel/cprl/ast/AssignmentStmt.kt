@@ -30,6 +30,8 @@ class AssignmentStmt(
     }
 
     override fun emit() {
-        // ...
+        variable.emit()
+        expr.emit()
+        emitStoreInst(expr.type)
     }
 }
