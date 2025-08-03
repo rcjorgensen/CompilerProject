@@ -1,5 +1,8 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
+import edu.citadel.cprl.Type
+
 /**
  * The abstract syntax tree node for a loop statement.
  */
@@ -17,7 +20,18 @@ class LoopStmt : Statement() {
     fun getExitLabel(): String = L2
 
     override fun checkConstraints() {
-// ...
+        try {
+            whileExpr?.checkConstraints()
+            statement.checkConstraints()
+
+            val booleanExpr = whileExpr
+            if (booleanExpr != null && booleanExpr.type != Type.Boolean) {
+                val errorMsg = "The \"while\" expression should have type Boolean."
+                throw error(booleanExpr.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

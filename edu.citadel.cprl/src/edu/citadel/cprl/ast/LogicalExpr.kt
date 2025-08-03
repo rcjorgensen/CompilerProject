@@ -35,14 +35,12 @@ class LogicalExpr(leftOperand: Expression, operator: Token, rightOperand: Expres
             rightOperand.checkConstraints()
 
             if (leftOperand.type != Type.Boolean) {
-                val errorMsg = "Left operand for a logical expression " +
-                        "should have type Boolean."
+                val errorMsg = "Left operand for a logical expression should have type Boolean."
                 throw error(leftOperand.position, errorMsg)
             }
 
             if (rightOperand.type != Type.Boolean) {
-                val errorMsg = "Right operand for a logical expression " +
-                        "should have type Boolean."
+                val errorMsg = "Right operand for a logical expression should have type Boolean."
                 throw error(rightOperand.position, errorMsg)
             }
         } catch (e: ConstraintException) {

@@ -1,5 +1,8 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
+import edu.citadel.cprl.Type
+
 /**
  * The abstract syntax tree node for an exit statement.
  *
@@ -9,11 +12,19 @@ package edu.citadel.cprl.ast
  */
 class ExitStmt(
     private val whenExpr: Expression?,
-    private val loopStmt: LoopStmt,
-)   // nonstructural reference
-    : Statement() {
+    private val loopStmt: LoopStmt, // nonstructural reference
+) : Statement() {
     override fun checkConstraints() {
-// ...
+        try {
+            whenExpr?.checkConstraints()
+
+            if (whenExpr != null && whenExpr.type != Type.Boolean) {
+                val errorMsg = "The \"when\" expression should have type Boolean."
+                throw error(whenExpr.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

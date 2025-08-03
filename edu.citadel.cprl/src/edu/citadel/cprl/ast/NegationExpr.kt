@@ -1,5 +1,6 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -10,7 +11,7 @@ import edu.citadel.cprl.Type
  * A simple example would be "-x".
  *
  * @constructor Construct a negation expression with the specified
- *              operator ("-") and operand.
+ *              operator ("-" or "+") and operand.
  */
 class NegationExpr(operator: Token, operand: Expression) : UnaryExpr(operator, operand) {
     init {
@@ -19,7 +20,16 @@ class NegationExpr(operator: Token, operand: Expression) : UnaryExpr(operator, o
     }
 
     override fun checkConstraints() {
-// ...
+        try {
+            operand.checkConstraints()
+
+            if (operand.type != Type.Integer) {
+                val errorMsg = "Expression following \"-\" operator is not an Integer expression."
+                throw error(operand.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

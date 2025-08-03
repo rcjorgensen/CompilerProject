@@ -1,5 +1,6 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
 
@@ -23,7 +24,22 @@ class MultiplyingExpr(leftOperand: Expression, operator: Token, rightOperand: Ex
     }
 
     override fun checkConstraints() {
-// ...
+        try {
+            leftOperand.checkConstraints()
+            rightOperand.checkConstraints()
+
+            if (leftOperand.type != Type.Integer) {
+                val errorMsg = "Left operand for expression should have type Integer."
+                throw error(leftOperand.position, errorMsg)
+            }
+
+            if (rightOperand.type != Type.Integer) {
+                val errorMsg = "Right operand for expression should have type Integer."
+                throw error(rightOperand.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

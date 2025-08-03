@@ -1,6 +1,7 @@
 package edu.citadel.cprl.ast
 
 import edu.citadel.compiler.CodeGenException
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -29,7 +30,22 @@ class RelationalExpr(leftOperand: Expression, operator: Token, rightOperand: Exp
     }
 
     override fun checkConstraints() {
-// ...
+        try {
+            leftOperand.checkConstraints()
+            rightOperand.checkConstraints()
+
+            if (leftOperand.type != rightOperand.type) {
+                val errorMsg = "Type mismatch for left and right operands of a relational expression."
+                throw error(operator.position, errorMsg)
+            }
+
+            if (!leftOperand.type.isScalar || !rightOperand.type.isScalar) {
+                val errorMsg = "Operand types not permitted for a relational expression."
+                throw error(operator.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

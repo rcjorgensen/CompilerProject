@@ -1,5 +1,6 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.compiler.Position
 
 /**
@@ -15,10 +16,20 @@ class AssignmentStmt(
     private val assignPosition: Position,
 ) : Statement() {
     override fun checkConstraints() {
-// ...
+        try {
+            variable.checkConstraints()
+            expr.checkConstraints()
+
+            if (!matchTypes(variable.type, expr)) {
+                val errorMsg = "Type mismatch for assignment statement."
+                throw error(assignPosition, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {
-// ...
+        // ...
     }
 }

@@ -1,5 +1,6 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.cprl.Symbol
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -18,7 +19,16 @@ class NotExpr(operator: Token, operand: Expression) : UnaryExpr(operator, operan
     }
 
     override fun checkConstraints() {
-// ...
+        try {
+            operand.checkConstraints()
+
+            if (operand.type != Type.Boolean) {
+                val errorMsg = "Expression following \"not\" operator is not a Boolean expression."
+                throw error(operand.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     override fun emit() {

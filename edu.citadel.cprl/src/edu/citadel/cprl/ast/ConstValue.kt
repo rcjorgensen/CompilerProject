@@ -51,11 +51,11 @@ class ConstValue : Expression {
         get() {
             when (literal.symbol) {
                 Symbol.intLiteral -> {
-                    try {
-                        return literal.text.toInt()
-                    } catch (e: NumberFormatException) {
+                    return try {
+                        literal.text.toInt()
+                    } catch (_: NumberFormatException) {
                         // error will be reported in checkConstraints()
-                        return 1
+                        1
                     }
                 }
 
@@ -76,7 +76,7 @@ class ConstValue : Expression {
             if (literal.symbol == Symbol.intLiteral && decl == null) {
                 try {
                     literal.text.toInt()
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     val errorMsg = "The number \"${literal.text}\" cannot " +
                             "be converted to an integer in CPRL."
                     throw error(literal.position, errorMsg)
