@@ -1,5 +1,7 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
+import edu.citadel.cprl.ArrayType
 import edu.citadel.cprl.Token
 
 /**
@@ -15,7 +17,23 @@ class FunctionDecl(funcId: Token) : SubprogramDecl(funcId) {
         get() = -type.size - paramLength
 
     override fun checkConstraints() {
-// ...   call super.checkConstraints() before checking any additional constraints
+        try {
+            super.checkConstraints()
+
+            for (paramDecl in formalParams) {
+                if (paramDecl.isVarParam && paramDecl.type !is ArrayType) {
+                    val errorMsg = "A function cannot have var parameters."
+                    throw error(paramDecl.position, errorMsg)
+                }
+            }
+
+            if (!hasReturnStmt(statements)) {
+                val errorMsg = "A function must have at least one return statement."
+                throw error(position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 
     /**
@@ -58,6 +76,17 @@ class FunctionDecl(funcId: Token) : SubprogramDecl(funcId) {
     }
 
     override fun emit() {
-// ...
+        setRelativeAddresses()
+
+        emitLabel(subprogramLabel)
+
+        if (varLength > 0)
+            emit("PROC $varLength")
+
+        for (decl in initialDecls)
+            decl.emit()
+
+        for (statement in statements)
+            statement.emit()
     }
 }

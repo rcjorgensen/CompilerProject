@@ -633,15 +633,17 @@ class Parser(
      */
     private fun parseParameterDecl(): ParameterDecl? {
         try {
+            var isVarParam = false
             if (scanner.symbol == Symbol.varRW) {
                 matchCurrentSymbol()
+                isVarParam = true
             }
             val paramId = scanner.token
             match(Symbol.identifier)
             match(Symbol.colon)
             val type = parseTypeName()
 
-            val decl = ParameterDecl(paramId, type, isVarParam = false)
+            val decl = ParameterDecl(paramId, type, isVarParam)
             idTable.add(decl)
             return decl
         } catch (e: ParserException) {
