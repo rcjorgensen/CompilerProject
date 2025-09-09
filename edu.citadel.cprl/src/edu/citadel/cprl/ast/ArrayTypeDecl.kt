@@ -1,5 +1,6 @@
 package edu.citadel.cprl.ast
 
+import edu.citadel.compiler.ConstraintException
 import edu.citadel.cprl.ArrayType
 import edu.citadel.cprl.Token
 import edu.citadel.cprl.Type
@@ -17,6 +18,20 @@ import edu.citadel.cprl.Type
 class ArrayTypeDecl(typeId: Token, elementType: Type, private val numElements: ConstValue) :
     InitialDecl(typeId, ArrayType(typeId.text, numElements.intValue, elementType)) {
     override fun checkConstraints() {
-// ...
+        try {
+            numElements.checkConstraints()
+
+            if (numElements.type != Type.Integer) {
+                val errorMsg = "Array size must have type Integer."
+                throw error(numElements.position, errorMsg)
+            }
+
+            if (numElements.intValue <= 0) {
+                val errorMsg = "Array size must be a positive integer."
+                throw error(numElements.position, errorMsg)
+            }
+        } catch (e: ConstraintException) {
+            errorHandler.reportError(e)
+        }
     }
 }

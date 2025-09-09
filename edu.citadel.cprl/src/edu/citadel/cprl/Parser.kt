@@ -641,9 +641,12 @@ class Parser(
             val paramId = scanner.token
             match(Symbol.identifier)
             match(Symbol.colon)
-            val type = parseTypeName()
+            val paramType = parseTypeName()
 
-            val decl = ParameterDecl(paramId, type, isVarParam)
+            if (paramType is ArrayType)
+                isVarParam = true
+
+            val decl = ParameterDecl(paramId, paramType, isVarParam)
             idTable.add(decl)
             return decl
         } catch (e: ParserException) {

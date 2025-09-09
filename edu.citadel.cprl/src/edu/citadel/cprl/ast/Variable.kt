@@ -39,10 +39,16 @@ open class Variable(
                     type = arrayType.elementType
 
                     // check that the selector expression is not a field expression
-// ...
+                    if (expr is FieldExpr) {
+                        val errorMsg = "The selector expression must not be a field expression."
+                        throw error(expr.position, errorMsg)
+                    }
 
                     // check that the type of the index expression is Integer
-// ...
+                    if (expr.type != Type.Integer) {
+                        val errorMsg = "Index expression must have type Integer."
+                        throw error(expr.position, errorMsg)
+                    }
                 } else if (type is RecordType) {
                     if (expr is FieldExpr) {
 
@@ -117,7 +123,10 @@ open class Variable(
                 expr.emit()   // emit the index
 
                 // multiply by size of array base type to get offset
-// ...
+                if (type.elementType.size > 1) {
+                    emit("LDCINT ${type.elementType.size}")
+                    emit("MUL")
+                }
 
                 // Note: No code to perform bounds checking for the index to
                 // ensure that the index is >= 0 and < number of elements.
