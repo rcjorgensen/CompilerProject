@@ -43,7 +43,7 @@ class ReturnStmt(
         if (returnExpr != null && subprogramDecl is FunctionDecl) {
             emit("LDLADDR ${subprogramDecl.relAddr}")
             returnExpr.emit()
-            emitStoreInst(subprogramDecl.type)
+            emitStoreInst(returnExpr.type)
         }
         emit("RET ${subprogramDecl.paramLength}")
     }

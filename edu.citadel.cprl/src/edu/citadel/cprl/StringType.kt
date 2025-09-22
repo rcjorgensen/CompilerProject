@@ -8,9 +8,7 @@ package edu.citadel.cprl
  *
  * @constructor Construct a string type with the specified type name and capacity.
  */
-class StringType(typeName: String, val capacity: Int) : Type(typeName, 0)
-// ... In call to superclass constructor, 0 is not correct as the size for the string type.
-// ... What is the size for the string type?  Hint: Read the book.
+class StringType(typeName: String, val capacity: Int) : Type(typeName, Integer.size + capacity * Char.size)
 {
     /**
      * Construct a string type with the specified capacity.  The type name

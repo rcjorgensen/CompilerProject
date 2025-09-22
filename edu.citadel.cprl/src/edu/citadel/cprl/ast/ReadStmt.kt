@@ -29,8 +29,7 @@ class ReadStmt(private val variable: Variable) : Statement() {
     override fun emit() {
         variable.emit()
 
-        val type = variable.type
-        when (type) {
+        when (val type = variable.type) {
             is StringType -> emit("GETSTR ${type.capacity}")
             Type.Integer -> emit("GETINT")
             else   // type must be Char
