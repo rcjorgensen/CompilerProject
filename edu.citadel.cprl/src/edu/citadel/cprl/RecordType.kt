@@ -9,16 +9,17 @@ import edu.citadel.cprl.ast.FieldDecl
  * @constructor Construct a record type with the specified type name,
  *              list of field declarations, and size.
  */
-class RecordType(typeName: String, fieldDecls: List<FieldDecl>) : Type(typeName, 0)
-// ... In call to superclass constructor, 0 is not correct as the size for the record type.
-// ... What is the size for the record type?  Hint: Read the book.
-{
+class RecordType(typeName: String, fieldDecls: List<FieldDecl>) : Type(typeName, fieldDecls.sumOf { it.size }) {
     // Use a hash map for efficient lookup of field names.
     private var fieldNameMap = HashMap<String, FieldDecl>()
 
     init {
-        for (fieldDecl in fieldDecls)
+        var nextOffset = 0
+        for (fieldDecl in fieldDecls) {
             fieldNameMap[fieldDecl.idToken.text] = fieldDecl
+            fieldDecl.offset = nextOffset
+            nextOffset += fieldDecl.size
+        }
     }
 
     /**

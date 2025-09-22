@@ -18,13 +18,11 @@ open class Variable(
     /**
      * Construct a variable that corresponds to a variable expression.
      */
-    constructor(varExpr: VariableExpr)
-            : this(varExpr.decl, varExpr.position, varExpr.selectorExprs)
+    constructor(varExpr: VariableExpr) : this(varExpr.decl, varExpr.position, varExpr.selectorExprs)
 
     override fun checkConstraints() {
         try {
-            assert(decl is SingleVarDecl || decl is ParameterDecl)
-            { "Declaration is not a variable." }
+            assert(decl is SingleVarDecl || decl is ParameterDecl) { "Declaration is not a variable." }
 
             for (expr in selectorExprs) {
                 expr.checkConstraints()
@@ -51,7 +49,6 @@ open class Variable(
                     }
                 } else if (type is RecordType) {
                     if (expr is FieldExpr) {
-
                         // Applying the selector effectively changes the
                         // variable's type to the type of the field.
                         val recType = type as RecordType
@@ -62,10 +59,12 @@ open class Variable(
                             expr.fieldDecl = fieldDecl
                             type = fieldDecl.type
                         } else {
-                            val errorMsg = "\"${fieldId.text}\" is not a " +
-                                    "valid field name for $recType."
+                            val errorMsg = "\"${fieldId.text}\" is not a valid field name for $recType."
                             throw error(fieldId.position, errorMsg)
                         }
+                    } else {
+                        val errorMsg = "Index selector expression not allowed for records."
+                        throw error(expr.position, errorMsg)
                     }
                 } else if (type is StringType) {
                     // Selector can be field expression .length (type Integer)
@@ -94,8 +93,7 @@ open class Variable(
                         }
                     }
                 } else {
-                    val errorMsg = "Selector expression not allowed; " +
-                            "not an array, record, or string."
+                    val errorMsg = "Selector expression not allowed; not an array, record, or string."
                     throw error(expr.position, errorMsg)
                 }
             }
@@ -109,10 +107,8 @@ open class Variable(
             // address of actual parameter is value of var parameter
             emit("LDLADDR ${decl.relAddr}")
             emit("LOADW")
-        } else if (decl.scopeLevel == ScopeLevel.GLOBAL)
-            emit("LDGADDR ${decl.relAddr}")
-        else
-            emit("LDLADDR ${decl.relAddr}")
+        } else if (decl.scopeLevel == ScopeLevel.GLOBAL) emit("LDGADDR ${decl.relAddr}")
+        else emit("LDLADDR ${decl.relAddr}")
 
         // For an array, record, or string, at this point the base address is on the
         // top of the stack.  We need to replace it by the sum base address + offset
@@ -140,7 +136,8 @@ open class Variable(
 
                 if (expr.fieldDecl.offset != 0) {
                     // add offset to the base address
-// ...
+                    expr.emit()
+                    emit("ADD")
                 }
 
                 type = expr.fieldDecl.type

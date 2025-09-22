@@ -19,6 +19,6 @@ class FieldExpr(val fieldId: Token) : Expression(Type.Integer, fieldId.position)
 
     override fun emit() {
         assert(fieldDecl.offset >= 0) { "Invalid value for field offset." }
-// ...
+        emit("LDCINT ${fieldDecl.offset}")
     }
 }
